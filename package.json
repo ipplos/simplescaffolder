@@ -1,0 +1,23 @@
+{
+  "name": "simplescaffolder",
+  "version": "1.0.0",
+  "description": "A simple scaffolding utitlity to automatically generate code",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ipplos/simplescaffolder.git"
+  },
+  "keywords": [
+    "scaffolding",
+    "templates"
+  ],
+  "author": "Ioannis Panagopoulos <ipplos@gmail.com> (http://www.progware.org/blog/)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ipplos/simplescaffolder/issues"
+  },
+  "homepage": "https://github.com/ipplos/simplescaffolder#readme"
+}
