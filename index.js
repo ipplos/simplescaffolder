@@ -1,4 +1,6 @@
-﻿var hb = require('handlebars');
+﻿#!/usr/bin/env node
+
+var hb = require('handlebars');
 hb.registerHelper('ifCond', function (v1, operator, v2, options) {
     
     switch (operator) {
