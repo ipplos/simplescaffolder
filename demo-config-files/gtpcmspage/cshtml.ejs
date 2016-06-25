@@ -1,0 +1,28 @@
+@{
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+    ViewBag.CurrentPage = "<%pagename%>";
+}
+
+@section styles{
+    <link href="~/css/<%filename%>.css" rel="stylesheet" />
+}
+
+<div class="<%pagename%>">
+
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+       
+
+        });
+
+        var razorSet<%vmclassname%>VMServiceURLs = {
+
+        };
+    </script>
+
+    <script src="~/js/cms/<%filename%>.js"></script>
+}
+
