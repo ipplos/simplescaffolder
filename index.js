@@ -2,7 +2,7 @@
 
 var hb = require('handlebars');
 hb.registerHelper('ifCond', function (v1, operator, v2, options) {
-    
+
     switch (operator) {
         case '==':
             return (v1 == v2) ? options.fn(this) : options.inverse(this);
@@ -93,26 +93,25 @@ for (var i = 0; i < scaffolder.tasks.length; i++) {
     var targetFolder = getValueWithReplacement(inputContext,scaffolder.tasks[i].targetFolder);
     var filename = getValueWithReplacement(inputContext,scaffolder.tasks[i].filename);
     var extension = getValueWithReplacement(inputContext,scaffolder.tasks[i].extension);
-    
+
     var context = {};
     if (contextFile)
         context = JSON.parse(fs.readFileSync(contextFile).toString());
-    
+
     for (var j = 0; j < scaffolder.inputs.length; j++)
         context[scaffolder.inputs[j].varname] = inputContext[scaffolder.inputs[j].varname];
-    
-    var template = fs.readFileSync(templateFile).toString();
+
+    var template = fs.readFileSync(templateFile,'utf8').toString();
     var fileContentsToWrite = "";
     if (templateFile.indexOf("handlebars") != -1) {
         var hbTemplate = hb.compile(template);
         fileContentsToWrite = hbTemplate(context).replace(/^\s*\n/gm, '').replace(/~\s*/g, '');
     }
-    
+
     if (templateFile.indexOf("ejs") != -1) {
+      console.log(context);
         fileContentsToWrite = ejs.render(template, context).replace(/^\s*\n/gm, '').replace(/~\s*/g, '');
     }
     ensureDirectoryExistence(targetFolder + filename + extension);
     fs.writeFileSync(targetFolder + filename + extension, fileContentsToWrite);
 }
-
-
