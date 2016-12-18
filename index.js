@@ -1,5 +1,7 @@
 ﻿#!/usr/bin/env node
 
+console.log('Simple Scaffolder Ver 1.0');
+
 var hb = require('handlebars');
 hb.registerHelper('ifCond', function (v1, operator, v2, options) {
 
@@ -79,39 +81,66 @@ if (scaffolder == undefined) {
     console.log('Scaffolder\'s name '+ scaffolderName+' was not found in ' + configFilename + ' file');
     return;
 }
-
+console.log("\n== USER INPUT ===========================================================\n");
 // Get user input for the scaffolder's inputs
 var inputContext = {};
 for (var i = 0; i < scaffolder.inputs.length; i++) {
-    inputContext[scaffolder.inputs[i].varname] = readlineSync.question(scaffolder.inputs[i].description+'(' + scaffolder.inputs[i].varname + '): ');
-}
+	var questionString = scaffolder.inputs[i].description + '(' + scaffolder.inputs[i].varname + '): ';
 
+	var defaultValue = getValueWithReplacement(inputContext, scaffolder.inputs[i].default);
+	if (defaultValue)
+		questionString += '(def: ' + defaultValue + ')';
+
+
+	inputContext[scaffolder.inputs[i].varname] = readlineSync.question(questionString);
+	if (!inputContext[scaffolder.inputs[i].varname] && defaultValue) {
+		inputContext[scaffolder.inputs[i].varname] = defaultValue
+	}
+}
+console.log("\n== TEMPLATE EXECUTION ==================================================");
 // Execute the scaffolder's tasks
 for (var i = 0; i < scaffolder.tasks.length; i++) {
-    var templateFile = getValueWithReplacement(inputContext,scaffolder.tasks[i].templateFile);
-    var contextFile = getValueWithReplacement(inputContext,scaffolder.tasks[i].context);
-    var targetFolder = getValueWithReplacement(inputContext,scaffolder.tasks[i].targetFolder);
-    var filename = getValueWithReplacement(inputContext,scaffolder.tasks[i].filename);
-    var extension = getValueWithReplacement(inputContext,scaffolder.tasks[i].extension);
+	console.log("\n== "+i.toString()+" =======================================================");
+	console.log("Working with template file: \n" + getValueWithReplacement(context, scaffolder.tasks[i].templateFile));
+	var contextFile = getValueWithReplacement(inputContext, scaffolder.tasks[i].context);
+	var context = {};
+	if (contextFile)
+		context = JSON.parse(fs.readFileSync(contextFile).toString());
+	else
+		console.log("Context file: " + getValueWithReplacement(inputContext, scaffolder.tasks[i].context) + " not found!");
 
-    var context = {};
-    if (contextFile)
-        context = JSON.parse(fs.readFileSync(contextFile).toString());
+	for (var j = 0; j < scaffolder.inputs.length; j++)
+		context[scaffolder.inputs[j].varname] = inputContext[scaffolder.inputs[j].varname];
+	console.log("-----------------------------------------------------------------");
+	console.log("Context for template is:");
+	console.log(context);
+	console.log("-----------------------------------------------------------------");
 
-    for (var j = 0; j < scaffolder.inputs.length; j++)
-        context[scaffolder.inputs[j].varname] = inputContext[scaffolder.inputs[j].varname];
+    var templateFile = getValueWithReplacement(context,scaffolder.tasks[i].templateFile);
+    var targetFolder = getValueWithReplacement(context,scaffolder.tasks[i].targetFolder);
+    var filename = getValueWithReplacement(context,scaffolder.tasks[i].filename);
+    var extension = getValueWithReplacement(context,scaffolder.tasks[i].extension);
+	
+	console.log("targetFolder: " + targetFolder);
+	console.log("filename: " + filename);
+	console.log("extension: " + extension);
+	console.log("------------------------------------------------------------------");
 
     var template = fs.readFileSync(templateFile,'utf8').toString();
     var fileContentsToWrite = "";
-    if (templateFile.indexOf("handlebars") != -1) {
+	if (templateFile.indexOf("handlebars") != -1) {
+		console.log("Using Handlebars...");
         var hbTemplate = hb.compile(template);
         fileContentsToWrite = hbTemplate(context).replace(/^\s*\n/gm, '').replace(/~\s*/g, '');
     }
 
-    if (templateFile.indexOf("ejs") != -1) {
-      console.log(context);
+	if (templateFile.indexOf("ejs") != -1) {
+		console.log("Using ejs...");
         fileContentsToWrite = ejs.render(template, context).replace(/^\s*\n/gm, '').replace(/~\s*/g, '');
-    }
-    ensureDirectoryExistence(targetFolder + filename + extension);
-    fs.writeFileSync(targetFolder + filename + extension, fileContentsToWrite);
+	}
+	console.log("File contents created.");
+	ensureDirectoryExistence(targetFolder + filename + extension);
+	console.log("Writing contents to: "+ targetFolder + filename + extension);
+	fs.writeFileSync(targetFolder + filename + extension, fileContentsToWrite);
+	console.log("File generation ended.");
 }
