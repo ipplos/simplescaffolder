@@ -58,8 +58,13 @@ var getValueWithReplacement = function (inputContext, value){
     var matchedWords = value.match(re);
     if (!matchedWords) return value;
 
-    for (var i = 0; i < matchedWords.length; i++) {
-        value=value.replace(matchedWords[i], inputContext[matchedWords[i].replace(/%%/g, '')]);
+	for (var i = 0; i < matchedWords.length; i++) {
+		if (value.indexOf("LOWER") != -1) {
+			value = value.replace(matchedWords[i], inputContext[matchedWords[i].replace(/LOWER/g, '').replace(/%%/g, '')].toLowerCase());
+		}
+		else {
+			value = value.replace(matchedWords[i], inputContext[matchedWords[i].replace(/%%/g, '')]);
+		}
     }
     return value;
 }
