@@ -116,6 +116,15 @@ for (var i = 0; i < scaffolder.tasks.length; i++) {
 
 	for (var j = 0; j < scaffolder.inputs.length; j++)
 		context[scaffolder.inputs[j].varname] = inputContext[scaffolder.inputs[j].varname];
+
+	if (scaffolder.tasks[i].extraContexts != undefined) {
+		for (var k = 0; k < scaffolder.tasks[i].extraContexts.length; k++) {
+			var extraContext = getValueWithReplacement(inputContext, scaffolder.tasks[i].extraContexts[k]);
+			context[extraContext.name] = extraContext.value;
+			for (var j = 0; j < scaffolder.inputs.length; j++)
+				context[extraContext.name][scaffolder.inputs[j].varname] = inputContext[scaffolder.inputs[j].varname];
+		}
+	}
 	console.log("-----------------------------------------------------------------");
 	console.log("Context for template is:");
 	console.log(context);
